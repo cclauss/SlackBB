@@ -1,4 +1,4 @@
-# SlackBB
+# SlackBB [![Build Status](https://travis-ci.org/lukaskollmer/SlackBB.svg?branch=master)](https://travis-ci.org/lukaskollmer/SlackBB)
 
 SlackBB is a Python script that monitors a NodeBB forum for new posts and sends Slack notifications to a channel of your choice.
 
