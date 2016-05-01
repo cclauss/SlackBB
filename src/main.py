@@ -49,7 +49,10 @@ def get_recent_posts():
 
     endpoint = 'https://forum.omz-software.com/api/recent/posts'
 
-    api_response = urllib2.urlopen(endpoint).read()
+    try:
+        api_response = urllib2.urlopen(endpoint).read()
+    except:
+        return []
 
     json_data = json.loads(api_response)
 
@@ -83,7 +86,7 @@ def check_for_new_posts():
             success = slack.send_new_forum_post_to_slack(post)
             save_send_notification_success_for_topic_with_id(post.id, success)
         else:
-            print('did save')
+            pass
 
     threading.Timer(60, check_for_new_posts).start()
 
