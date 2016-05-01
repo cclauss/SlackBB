@@ -1,3 +1,11 @@
 config.json
 data.txt
 data.txt
+
+src/main.pyc
+
+src/slack.pyc
+
+src/slack.pyc
+
+*.pyc
