@@ -1,11 +1,10 @@
 # copyright 2016 Lukas Kollmer<lukas@kollmer.me>
 
-import slack
-import urllib2
 import json
-from bs4 import BeautifulSoup
 import threading
-import sys
+import urllib2
+from bs4 import BeautifulSoup
+import slack
 from config import config
 
 
