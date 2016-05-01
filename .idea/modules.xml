@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/omz-forum-slack-service.iml" filepath="$PROJECT_DIR$/.idea/omz-forum-slack-service.iml" />
+      <module fileurl="file://$USER_HOME$/Developer/Python/SlackBB/.idea/SlackBB.iml" filepath="$USER_HOME$/Developer/Python/SlackBB/.idea/SlackBB.iml" />
     </modules>
   </component>
 </project>
