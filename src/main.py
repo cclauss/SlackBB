@@ -52,6 +52,7 @@ def get_recent_posts():
     try:
         api_response = urllib2.urlopen(endpoint).read()
     except:
+        print('unable to connect to the forum, will try again in 10 minutes')
         return []
 
     json_data = json.loads(api_response)
@@ -59,7 +60,6 @@ def get_recent_posts():
     for post in json_data:
         post_index = int(post['index'])
         if post_index == 1:
-            print(post)
             _post = ForumPost(post)
             posts.append(_post)
     return posts
@@ -85,10 +85,12 @@ def check_for_new_posts():
         if not did_already_notify_about_topic_with_id(post.id):
             success = slack.send_new_forum_post_to_slack(post)
             save_send_notification_success_for_topic_with_id(post.id, success)
+            if success is True:
+                print('did send out notification for topic' + post.title)
         else:
             pass
 
-    threading.Timer(60, check_for_new_posts).start()
+    threading.Timer(60*10, check_for_new_posts).start()
 
 
 if __name__ == '__main__':
