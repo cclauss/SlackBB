@@ -5,13 +5,8 @@ import urllib2
 import json
 from bs4 import BeautifulSoup
 import threading
-
-
-class ForumTopic(object):
-    title = None
-    url = None
-    summary = None
-    id = None
+import sys
+from config import config
 
 
 class ForumUser(object):
@@ -27,16 +22,16 @@ class ForumPost(object):
     title = None
     id = None
 
-    def __init__(self, json_object):
+    def __init__(self, json_object, forum_url_endpoint):
         self.user = ForumUser()
         self.user.name = json_object['user']['username']
         _avatar_url = json_object['user']['picture']
-        if 'http' not in _avatar_url:
-            _avatar_url = 'https://forum.omz-software.com' + _avatar_url
+        if 'http' not in _avatar_url: # The user uploaded its avatar to the forum, fetch it from there
+            _avatar_url = forum_url_endpoint + _avatar_url
         self.user.avatar_url = _avatar_url
         self.title = json_object['topic']['title']
         self.index = str(json_object['index'])
-        self.url = 'https://forum.omz-software.com/topic/' + json_object['topic']['slug'] + '/' + self.index
+        self.url = forum_url_endpoint + '/topic/' + json_object['topic']['slug'] + '/' + self.index
         self.id = json_object['topic']['tid']
 
         content = json_object['content']
@@ -44,15 +39,15 @@ class ForumPost(object):
         self.text = soup.get_text()
 
 
-def get_recent_posts():
+def get_recent_posts(forum_url_endpoint):
     posts = []
 
-    endpoint = 'https://forum.omz-software.com/api/recent/posts'
+    api_endpoint = forum_url_endpoint + '/api/recent/posts'
 
     try:
-        api_response = urllib2.urlopen(endpoint).read()
+        api_response = urllib2.urlopen(api_endpoint).read()
     except:
-        print('unable to connect to the forum, will try again in 10 minutes')
+        #print('Unable to reach the Forum API, will try again in 10 minutes')
         return []
 
     json_data = json.loads(api_response)
@@ -60,7 +55,7 @@ def get_recent_posts():
     for post in json_data:
         post_index = int(post['index'])
         if post_index == 1:
-            _post = ForumPost(post)
+            _post = ForumPost(post, forum_url_endpoint)
             posts.append(_post)
     return posts
 
@@ -78,15 +73,15 @@ def save_send_notification_success_for_topic_with_id(topic_id, success):
             f.write(text)
 
 
-def check_for_new_posts():
-    recent_posts = get_recent_posts()
+def check_for_new_posts(forum_url_endpoint):
+    recent_posts = get_recent_posts(forum_url_endpoint)
 
     for post in recent_posts:
         if not did_already_notify_about_topic_with_id(post.id):
             success = slack.send_new_forum_post_to_slack(post)
             save_send_notification_success_for_topic_with_id(post.id, success)
             if success is True:
-                print('did send out notification for topic' + post.title)
+                print('Sent slack message for topic ' + post.title)
         else:
             pass
 
@@ -94,4 +89,6 @@ def check_for_new_posts():
 
 
 if __name__ == '__main__':
-    check_for_new_posts()
+    forum_url = config['forum-url']
+    print('Will start monitoring ' + forum_url + ' for new posts')
+    check_for_new_posts(forum_url)
