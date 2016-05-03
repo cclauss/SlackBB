@@ -53,9 +53,9 @@ def get_recent_posts(forum_url_endpoint):
 
     for post in json_data:
         post_index = int(post['index'])
-        #if post_index == 1:
-        _post = ForumPost(post, forum_url_endpoint)
-        posts.append(_post)
+        if post_index == 1:
+            _post = ForumPost(post, forum_url_endpoint)
+            posts.append(_post)
     return posts
 
 
