@@ -46,16 +46,16 @@ def get_recent_posts(forum_url_endpoint):
     try:
         api_response = urllib2.urlopen(api_endpoint).read()
     except:
-        #print('Unable to reach the Forum API, will try again in 10 minutes')
+        print('Unable to reach the Forum API, will try again in 10 minutes')
         return []
 
     json_data = json.loads(api_response)
 
     for post in json_data:
         post_index = int(post['index'])
-        if post_index == 1:
-            _post = ForumPost(post, forum_url_endpoint)
-            posts.append(_post)
+        #if post_index == 1:
+        _post = ForumPost(post, forum_url_endpoint)
+        posts.append(_post)
     return posts
 
 
@@ -72,8 +72,8 @@ def save_send_notification_success_for_topic_with_id(topic_id, success):
             f.write(text)
 
 
-def check_for_new_posts(forum_url_endpoint):
-    recent_posts = get_recent_posts(forum_url_endpoint)
+def check_for_new_posts():
+    recent_posts = get_recent_posts(forum_url)
 
     for post in recent_posts:
         if not did_already_notify_about_topic_with_id(post.id):
@@ -84,10 +84,11 @@ def check_for_new_posts(forum_url_endpoint):
         else:
             pass
 
-    threading.Timer(60*10, check_for_new_posts).start()
+    threading.Timer(10*60, check_for_new_posts).start()
 
 
 if __name__ == '__main__':
+    global forum_url
     forum_url = config['forum-url']
     print('Will start monitoring ' + forum_url + ' for new posts')
-    check_for_new_posts(forum_url)
+    check_for_new_posts()

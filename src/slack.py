@@ -1,17 +1,14 @@
 # Copyright 2016 Lukas Kollmer<lukas@kollmer.me>
 
-from slacker import Slacker
 from config import config
+import urllib2
+import json
 
-slack_token = config['slack-token']
+slack_webhook_url = config['slack-webhook-url']
 slack_channel = config['slack-channel']
-slack = Slacker(slack_token)
 
 
 def send_new_forum_post_to_slack(post):
-    # Slack documentation: https://api.slack.com/methods/chat.postMessage
-    # Slack documentation: https://api.slack.com/docs/attachments
-
     attachments = [
         {
             'fallback': 'New post by @' + post.user.name,  # Fallback is used in iOS notifications
@@ -25,12 +22,19 @@ def send_new_forum_post_to_slack(post):
         }
     ]
 
-    slack_username = post.user.name + ' (via ForumBot)'
-
-    response = slack.chat.post_message(slack_channel,
-                                       text=None,
-                                       username=slack_username,
-                                       icon_url=post.user.avatar_url,  # TODO: Create/Find an avatar for the bot
-                                       attachments=attachments
-                                       )
-    return response.successful
+    data = json.dumps(
+        {
+            'channel' : slack_channel,
+            'username' : post.user.name,
+            'icon_url' : post.user.avatar_url,
+            'attachments' : attachments
+        }
+    )
+    req = urllib2.Request(slack_webhook_url, data, {'Content-Type': 'application/json'})
+    f = urllib2.urlopen(req)
+    response = f.read()
+    f.close()
+    if response == 'ok':
+        return True
+    else:
+        return False
