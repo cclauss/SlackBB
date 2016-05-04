@@ -6,6 +6,7 @@ import urllib2
 from bs4 import BeautifulSoup
 import slack
 from config import config
+from xml.sax.saxutils import unescape
 
 
 class ForumUser(object):
@@ -28,14 +29,14 @@ class ForumPost(object):
         if 'http' not in _avatar_url: # The user uploaded its avatar to the forum, fetch it from there
             _avatar_url = forum_url_endpoint + _avatar_url
         self.user.avatar_url = _avatar_url
-        self.title = json_object['topic']['title']
+        self.title = unescape(json_object['topic']['title'])
         self.index = str(json_object['index'])
         self.url = forum_url_endpoint + '/topic/' + json_object['topic']['slug'] + '/' + self.index
         self.id = json_object['topic']['tid']
 
         content = json_object['content']
         soup = BeautifulSoup(content, 'html.parser')
-        self.text = soup.get_text()
+        self.text = unescape(soup.get_text())
 
 
 def get_recent_posts(forum_url_endpoint):
