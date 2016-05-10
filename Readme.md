@@ -9,7 +9,7 @@ Your config file should contain:
 
 ```
 {
-  "slack-token" : "YOUR_SLACK_TOKEN",
+  "slack-webhook-url" : "YOUR_SLACK_TOKEN",
   "slack-channel" : "YOUR_SLACK_CHANNEL",
   "forum-url" : "YOUR_FORUM_URL"
 }
