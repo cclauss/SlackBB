@@ -34,7 +34,4 @@ def send_new_forum_post_to_slack(post):
     f = urllib2.urlopen(req)
     response = f.read()
     f.close()
-    if response == 'ok':
-        return True
-    else:
-        return False
+    return response == 'ok'
